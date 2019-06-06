@@ -1,0 +1,46 @@
+{
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "release": "lerna version",
+    "lint": "xo .; exit 0;",
+    "test": "npm run lint",
+    "publish": "lerna publish from-git --yes",
+    "xo": "xo"
+  },
+  "devDependencies": {
+    "ava": "^1.4.1",
+    "eslint-config-prettier": "^4.3.0",
+    "lerna": "^3.14.1",
+    "pre-commit": "^1.2.2",
+    "xo": "^0.24.0"
+  },
+  "pre-commit": [
+    "test"
+  ],
+  "xo": {
+    "prettier": true,
+    "extends": [
+      "prettier"
+    ],
+    "ignores": [
+      "**/test/**",
+      "examples"
+    ],
+    "space": true,
+    "semicolon": false,
+    "rules": {
+      "import/no-unassigned-import": 0,
+      "import/extensions": 0,
+      "ava/no-skip-test": 0,
+      "ava/no-only-test": 0,
+      "capitalized-comments": 0,
+      "camelcase": 0,
+      "max-params": 0,
+      "complexity": 0,
+      "no-ex-assign": 0
+    }
+  }
+}
