@@ -7,14 +7,14 @@ global.cws = {
 const nanoid = require('nanoid')
 const UrlPattern = require('url-pattern')
 const { WebSocketServer } = require('@clusterws/cws')
-const { write } = require('./protocol')
+const { write } = require('@rooms/protocol')
+const pkg = require('../package.json')
+const config = require('../config')
 const createTransport = require('./transports')
 const { makeError, merge, parseUrl } = require('./utils')
 const createRooms = require('./rooms')
 const createBus = require('./bus')
 const createManager = require('./manager')
-const pkg = require('../package.json')
-const config = require('../config')
 
 const createServer = (options = {}) => {
   options = { ...config, ...options }
@@ -43,7 +43,7 @@ const createServer = (options = {}) => {
    */
 
   const findRoute = path => {
-    for (var [route, [pattern, handler, options]] of routes) {
+    for (const [route, [pattern, handler, options]] of routes) {
       const params = pattern.match(path)
       if (params) {
         return { params, route, handler, options, found: true }

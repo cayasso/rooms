@@ -1,4 +1,4 @@
-const { unpack, types, write } = require('./protocol')
+const { unpack, types, write } = require('@rooms/protocol')
 
 const createSocket = (url, options = {}, WebSocket) => {
   let socket = null

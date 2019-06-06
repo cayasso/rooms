@@ -1,4 +1,4 @@
-const { types } = require('./protocol')
+const { types } = require('@rooms/protocol')
 const createSocket = require('./socket')
 
 const createRoom = (url, options = {}, WebSocket) => {
@@ -20,7 +20,6 @@ const createRoom = (url, options = {}, WebSocket) => {
   const sync = data => {
     data = merge(data)
     socket.emit('state', data)
-    //socket.emit('*', 'state', data)
   }
 
   const send = (event, data) => {
@@ -76,10 +75,8 @@ const createRoom = (url, options = {}, WebSocket) => {
   }
 
   const onEvent = ([event, data, userId]) => {
-    if (event) {
-      socket.emit(event, data, userId)
-      //socket.emit('*', event, data, userId)
-    }
+    if (!event) return
+    socket.emit(event, data, userId)
   }
 
   const onSync = data => {
@@ -88,7 +85,6 @@ const createRoom = (url, options = {}, WebSocket) => {
 
   const onError = ([code, message]) => {
     socket.emit('error', { code, message })
-    //socket.emit('*', 'error', { code, message })
   }
 
   if (autoConnect) {

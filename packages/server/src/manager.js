@@ -1,6 +1,6 @@
 'use strict'
 
-const { types, unpack, broadcast } = require('./protocol')
+const { types, unpack, broadcast } = require('@rooms/protocol')
 
 const createManager = (server, options) => {
   const { transport, transform, rooms, bus, terminateOnDispose, terminiateDisposeTimeout } = options
@@ -52,6 +52,7 @@ const createManager = (server, options) => {
       if (Array.isArray(aud) && aud.length > 0) {
         return aud.forEach(id => sendEvent(ns, type, data, id))
       }
+
       id = aud
     }
 
@@ -152,7 +153,7 @@ const createManager = (server, options) => {
   }
 
   return async (socket, handler) => {
-    let { id, ns } = socket
+    const { id, ns } = socket
 
     // Avoid race condition
     await transport.delay(ns)

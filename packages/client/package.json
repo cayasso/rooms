@@ -10,7 +10,7 @@
     "prepublishOnly": "exit 0"
   },
   "dependencies": {
-    "@rooms/protocol": "^0.0.57"
+    "@rooms/protocol": "^0.0.1"
   },
   "peerDependencies": {
     "@clusterws/cws": "^0.14.0"
