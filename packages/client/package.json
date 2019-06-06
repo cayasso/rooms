@@ -1,0 +1,30 @@
+{
+  "name": "@rooms/client",
+  "version": "0.0.1",
+  "description": "Rooms client",
+  "author": "Jonathan Brumley <cayasso@gmail.com>",
+  "main": "./node.js",
+  "browser": "./index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "exit 0"
+  },
+  "dependencies": {
+    "@rooms/protocol": "^0.0.57"
+  },
+  "peerDependencies": {
+    "@clusterws/cws": "^0.14.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cayasso/rooms.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cayasso/rooms/issues"
+  },
+  "homepage": "https://github.com/cayasso/rooms#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}

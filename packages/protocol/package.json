@@ -1,0 +1,26 @@
+{
+  "name": "@rooms/protocol",
+  "version": "0.0.1",
+  "description": "Rooms protocol",
+  "author": "Jonathan Brumley <cayasso@gmail.com>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "exit 0"
+  },
+  "dependencies": {
+    "notepack.io": "^2.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cayasso/rooms.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cayasso/rooms/issues"
+  },
+  "homepage": "https://github.com/cayasso/rooms#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}
