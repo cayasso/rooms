@@ -6,7 +6,7 @@
   "scripts": {
     "release": "lerna version",
     "lint": "xo .; exit 0;",
-    "test": "npm run lint'",
+    "test": "npm run lint",
     "prepublishOnly": "lerna run prepublishOnly",
     "xo": "xo"
   },
