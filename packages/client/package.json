@@ -6,8 +6,7 @@
   "main": "./node.js",
   "browser": "./index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublishOnly": "exit 0"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@rooms/protocol": "^0.0.2"
