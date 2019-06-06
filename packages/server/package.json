@@ -1,6 +1,6 @@
 {
   "name": "@rooms/server",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Rooms server",
   "author": "Jonathan Brumley <cayasso@gmail.com>",
   "main": "./index.js",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@clusterws/cws": "^0.14.0",
-    "@rooms/protocol": "^0.0.1",
+    "@rooms/protocol": "^0.0.2",
     "component-emitter": "^1.3.0",
     "debug": "^4.1.1",
     "ioredis": "^4.9.5",

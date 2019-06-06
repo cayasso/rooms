@@ -1,6 +1,6 @@
 {
   "name": "@rooms/client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Rooms client",
   "author": "Jonathan Brumley <cayasso@gmail.com>",
   "main": "./node.js",
@@ -10,7 +10,7 @@
     "prepublishOnly": "exit 0"
   },
   "dependencies": {
-    "@rooms/protocol": "^0.0.1"
+    "@rooms/protocol": "^0.0.2"
   },
   "peerDependencies": {
     "@clusterws/cws": "^0.14.0"
