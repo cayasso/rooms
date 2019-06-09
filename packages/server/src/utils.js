@@ -11,7 +11,7 @@ const makeLogger = require('debug')
  * @type public
  */
 
-const debug = ns => makeLogger(`regatta:${ns}`)
+const debug = ns => makeLogger(`rooms:${ns}`)
 const log = debug('error')
 
 /**

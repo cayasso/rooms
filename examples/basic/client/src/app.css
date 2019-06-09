@@ -1,0 +1,16 @@
+.root {
+  background: #8dc163;
+  padding: 1em;
+}
+
+.flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+button {
+  padding: 1em;
+  font-size: 24px;
+  width: 500px;
+}

@@ -1,9 +1,9 @@
 'use strict'
 
 const Redis = require('ioredis')
-const { sleep } = require('../utils')
+const { sleep, encode, decode } = require('../utils')
 
-const transport = (options = {}) => {
+module.exports = (options = {}) => {
   const sub = new Redis(options)
   const pub = new Redis(options)
   const fns = {}
@@ -34,14 +34,6 @@ const transport = (options = {}) => {
   const exist = async ns => {
     const channels = await pub.pubsub('channels', ns)
     return Boolean(channels.length)
-  }
-
-  const encode = data => {
-    return JSON.stringify(data)
-  }
-
-  const decode = data => {
-    return JSON.parse(data)
   }
 
   const delay = async ns => {
@@ -78,5 +70,3 @@ const transport = (options = {}) => {
     close
   }
 }
-
-module.exports = transport

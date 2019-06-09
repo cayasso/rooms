@@ -3,7 +3,7 @@
 const { types, unpack, broadcast } = require('@rooms/protocol')
 
 const createManager = (server, options) => {
-  const { transport, transform, rooms, bus, terminateOnDispose, terminiateDisposeTimeout } = options
+  const { engine, transform, rooms, bus, terminateOnDispose, terminiateDisposeTimeout } = options
   const EVENT = 'event'
   const DISPOSE = 'dispose'
 
@@ -153,18 +153,22 @@ const createManager = (server, options) => {
   }
 
   return async (socket, handler) => {
-    const { id, ns } = socket
+    const { id, ns, user, query } = socket
 
     // Avoid race condition
-    await transport.delay(ns)
+    await engine.delay(ns)
 
     // Check if room listener exist
-    if (!(await transport.exist(`c:${ns}`))) {
+    if (!(await engine.exist(`c:${ns}`))) {
       await createRoom(ns, handler)
     }
 
+    const data = { ...query }
+
+    if (user) data.user = user
+
     // Send a join command to the room
-    sendCommand(ns, id, { type: types.JOIN })
+    sendCommand(ns, id, { type: types.JOIN, data })
     socket.on('close', () => sendCommand(ns, id, { type: types.LEAVE }))
     return socket.on('message', onMessage.bind(null, ns, id))
   }

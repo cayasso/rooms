@@ -1,17 +1,13 @@
 const { unpack, types, write } = require('@rooms/protocol')
 
 const createSocket = (url, options = {}, WebSocket) => {
-  let socket = null
+  let ws = null
   let attempt = 0
   let online = false
   let timer = null
 
   const fns = new Map()
   const { token, timeout = 1e3, attempts = Infinity, pingInterval = 10000, params = {} } = options
-
-  const merge = data => {
-    Object.assign(socket, data)
-  }
 
   const toQs = data => {
     return Object.keys(data)
@@ -21,12 +17,12 @@ const createSocket = (url, options = {}, WebSocket) => {
 
   const connect = () => {
     const socketUrl = url + '?' + toQs({ ...params, token })
-    socket = new WebSocket(socketUrl)
-    socket.binaryType = 'arraybuffer'
-    socket.addEventListener('message', onMessage)
-    socket.onclose = onClose
-    socket.addEventListener('error', onError)
-    socket.addEventListener('open', onOpen)
+    ws = new WebSocket(socketUrl)
+    ws.binaryType = 'arraybuffer'
+    ws.addEventListener('message', onMessage)
+    ws.onclose = onClose
+    ws.addEventListener('error', onError)
+    ws.addEventListener('open', onOpen)
   }
 
   const onOpen = () => {
@@ -37,21 +33,15 @@ const createSocket = (url, options = {}, WebSocket) => {
   const onMessage = ({ data: payload }) => {
     const { type, data } = unpack(payload)
 
-    console.log('incoming message', type, data)
-
-    switch (type) {
-      case types.PING:
-        socket.send(types.PONG)
-        emit('ping')
-        return resetPing()
-      case types.ID:
-        merge(data)
-        return
-      default:
-        break
+    if (type === types.PING) {
+      ws.send(types.PONG)
+      return resetPing(emit('ping'))
+    } else if (type === types.ID) {
+      Object.assign(ws, data)
+      return emit('ready')
     }
 
-    emit('data', { type, data })
+    emit('message', { type, data })
   }
 
   const onClose = data => {
@@ -65,7 +55,7 @@ const createSocket = (url, options = {}, WebSocket) => {
   }
 
   const send = (type, data) => {
-    write(socket, type, data)
+    write(ws, type, data)
   }
 
   const on = (id, fn) => {
@@ -85,7 +75,7 @@ const createSocket = (url, options = {}, WebSocket) => {
 
   const close = () => {
     online = false
-    socket.close()
+    ws.close()
     fns.clear()
   }
 
@@ -96,12 +86,12 @@ const createSocket = (url, options = {}, WebSocket) => {
 
   const resetPing = () => {
     clearTimeout(timer)
-    timer = setTimeout(() => socket.close(4001), pingInterval)
+    timer = setTimeout(() => ws.close(4001), pingInterval)
   }
 
   connect()
 
-  return { on, off, emit, send, close }
+  return { ws, on, off, emit, send, close }
 }
 
 module.exports = createSocket

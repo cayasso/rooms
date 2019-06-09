@@ -13,5 +13,6 @@ module.exports = rc('rooms', {
   },
   roomTimeout: ms(process.env.ROOM_TIMEOUT || '10s'),
   terminiateDisposeTimeout: ms(process.env.TERMINATE_DISPOSE_TIMEOUT || '10s'),
-  terminateOnDispose: toBoolean(process.env.TERMINATE_ON_DISPOSE || false)
+  terminateOnDispose: toBoolean(process.env.TERMINATE_ON_DISPOSE || false),
+  wsEngine: 'cws'
 })

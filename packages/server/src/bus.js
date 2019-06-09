@@ -1,15 +1,14 @@
 const emitter = require('component-emitter')
-const { encode, decode } = require('./utils')
 
-module.exports = ({ transport }) => {
+module.exports = ({ engine }) => {
   const bus = emitter({})
 
   const onEvent = (ns, data) => {
-    bus.emit(`e:${ns}`, decode(data))
+    bus.emit(`e:${ns}`, data)
   }
 
   const onCommand = async (ns, data) => {
-    bus.emit(`c:${ns}`, decode(data))
+    bus.emit(`c:${ns}`, data)
   }
 
   bus.send = (ns, ...args) => {
@@ -17,11 +16,11 @@ module.exports = ({ transport }) => {
   }
 
   bus.publish = (ns, type, ...args) => {
-    transport.publish(`e:${ns}`, encode([type, ...args]))
+    engine.publish(`e:${ns}`, [type, ...args])
   }
 
   bus.call = (ns, id, data) => {
-    transport.publish(`c:${ns}`, encode({ ...data, id }))
+    engine.publish(`c:${ns}`, { ...data, id })
   }
 
   bus.bind = ns => {
@@ -30,13 +29,13 @@ module.exports = ({ transport }) => {
     const onRemoteCommand = onCommand.bind(null, ns)
 
     // Subscribe to event and command channels
-    transport.subscribe(`e:${ns}`, onRemoteEvent)
-    transport.subscribe(`c:${ns}`, onRemoteCommand)
+    engine.subscribe(`e:${ns}`, onRemoteEvent)
+    engine.subscribe(`c:${ns}`, onRemoteCommand)
 
     return () => {
       process.nextTick(() => {
-        transport.unsubscribe(`e:${ns}`, onRemoteEvent)
-        transport.unsubscribe(`c:${ns}`, onRemoteCommand)
+        engine.unsubscribe(`e:${ns}`, onRemoteEvent)
+        engine.unsubscribe(`c:${ns}`, onRemoteCommand)
         bus.removeAllListeners(`e:${ns}`)
         bus.removeAllListeners(`c:${ns}`)
       })

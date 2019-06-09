@@ -2,24 +2,13 @@ const { types } = require('@rooms/protocol')
 const createSocket = require('./socket')
 
 const createRoom = (url, options = {}, WebSocket) => {
-  const state = {}
   let socket = null
 
   const { autoConnect = true } = options
 
   const connect = () => {
     socket = createSocket(url, options, WebSocket)
-    socket.on('data', onData)
-    socket.on('connect', onConnect)
-  }
-
-  const merge = data => {
-    return Object.assign(state, data)
-  }
-
-  const sync = data => {
-    data = merge(data)
-    socket.emit('state', data)
+    socket.on('message', onMessage)
   }
 
   const send = (event, data) => {
@@ -51,12 +40,10 @@ const createRoom = (url, options = {}, WebSocket) => {
     socket.close()
   }
 
-  const onConnect = () => {
-    return setTimeout(sync, 500)
-  }
-
-  const onData = ({ type, data }) => {
+  const onMessage = ({ type, data }) => {
     switch (type) {
+      case types.DATA:
+        return onData(data)
       case types.EVENT:
         return onEvent(data)
       case types.JOIN:
@@ -65,8 +52,6 @@ const createRoom = (url, options = {}, WebSocket) => {
         return onEvent(['leave', ...data])
       case types.DISPOSE:
         return onEvent(['dispose', ...data])
-      case types.SYNC:
-        return onSync(data)
       case types.ERROR:
         return onError(data)
       default:
@@ -74,13 +59,13 @@ const createRoom = (url, options = {}, WebSocket) => {
     }
   }
 
+  const onData = data => {
+    socket.emit('data', data)
+  }
+
   const onEvent = ([event, data, userId]) => {
     if (!event) return
     socket.emit(event, data, userId)
-  }
-
-  const onSync = data => {
-    return sync(data)
   }
 
   const onError = ([code, message]) => {
@@ -91,7 +76,20 @@ const createRoom = (url, options = {}, WebSocket) => {
     connect()
   }
 
-  return { on, off, sync, send, close, connect }
+  return {
+    on,
+    off,
+    send,
+    close,
+    connect,
+    ws: socket.ws,
+    get id() {
+      return socket.ws.ns
+    },
+    get cid() {
+      return socket.ws.id
+    }
+  }
 }
 
 module.exports = createRoom
