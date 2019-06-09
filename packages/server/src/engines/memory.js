@@ -1,5 +1,6 @@
 'use strict'
 const Emitter = require('component-emitter')
+
 const event = new Emitter()
 
 module.exports = () => {
