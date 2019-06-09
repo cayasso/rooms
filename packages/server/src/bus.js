@@ -15,6 +15,10 @@ module.exports = ({ engine }) => {
     bus.publish(ns, 'event', ...args)
   }
 
+  bus.sendError = (ns, ...args) => {
+    bus.publish(ns, 'error', ...args)
+  }
+
   bus.publish = (ns, type, ...args) => {
     engine.publish(`e:${ns}`, [type, ...args])
   }

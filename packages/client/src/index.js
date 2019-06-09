@@ -68,8 +68,8 @@ const createRoom = (url, options = {}, WebSocket) => {
     socket.emit(event, data, userId)
   }
 
-  const onError = ([code, message]) => {
-    socket.emit('error', { code, message })
+  const onError = ([message, code]) => {
+    socket.emit('error', { message, code })
   }
 
   if (autoConnect) {

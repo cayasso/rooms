@@ -1,7 +1,7 @@
 const emitter = require('component-emitter')
 
 const createRoom = (ns, options = {}) => {
-  const { send, roomTimeout } = options
+  const { send, sendError, roomTimeout } = options
   const room = emitter({})
   const socks = new Map()
 
@@ -40,15 +40,19 @@ const createRoom = (ns, options = {}) => {
     timer = setTimeout(room.dispose, roomTimeout)
   }
 
-  room.send = (id, data) => {
-    if (!data && id && typeof id !== 'string') {
-      data = id
-      id = null
+  room.send = (...args) => {
+    send(...[ns, ...args])
+  }
+
+  room.sendError = (message, code, id) => {
+    if (code && typeof code !== 'number') {
+      id = code
+      code = 400
     }
 
-    const args = [ns, data]
+    const args = [ns, message, code]
     if (id) args.push(id)
-    send(...args)
+    sendError(...args)
   }
 
   room.dispose = () => {

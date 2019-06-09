@@ -6,6 +6,8 @@ const createManager = (server, options) => {
   const { engine, transform, rooms, bus, terminateOnDispose, terminiateDisposeTimeout } = options
   const EVENT = 'event'
   const DISPOSE = 'dispose'
+  const DEFAULT_ERROR_CODE = 400
+  const DEFAULT_ERROR_MESSAGE = 'Unknown error'
 
   /**
    * Send command to room via redis.
@@ -60,6 +62,8 @@ const createManager = (server, options) => {
       setTimeout(terminate, terminiateDisposeTimeout, ns)
     }
 
+    console.log('BROADCAST ERROR', ns, type, data, id)
+
     return broadcast(server, ns, type, data, id, transform)
   }
 
@@ -87,6 +91,7 @@ const createManager = (server, options) => {
    */
 
   const onEvent = (ns, [type, ...data]) => {
+    console.log('ON EVENT ====>', ns, type, data)
     sendEvent(ns, type, type === EVENT ? [type, ...data] : data)
   }
 
@@ -101,8 +106,8 @@ const createManager = (server, options) => {
    */
 
   const onCommand = async (ns, room, { type, id, data }) => {
-    console.log('incoming command', type, id, data)
     data = data || {}
+    console.log('incoming commands', type, id, data)
 
     try {
       switch (type) {
@@ -116,13 +121,12 @@ const createManager = (server, options) => {
           break
       }
     } catch (error) {
+      error = error || {}
+      if (!error.code) error.code = DEFAULT_ERROR_CODE
+      if (!error.message) error.message = DEFAULT_ERROR_MESSAGE
+
       console.log(error)
-
-      if (!error) {
-        error = { code: 400, message: 'Unknown error' }
-      }
-
-      sendEvent(ns, 'error', [error.code, error.message], id)
+      sendEvent(ns, 'error', [error.message, error.code], id)
     }
   }
 
@@ -137,7 +141,7 @@ const createManager = (server, options) => {
 
   const createRoom = async (ns, handler = () => {}) => {
     console.log('loading room', ns)
-    const room = await rooms(ns, { send: bus.send })
+    const room = await rooms(ns, { send: bus.send, sendError: bus.sendError })
     const onRemoteEvent = onEvent.bind(null, ns)
     const onRemoteCommand = onCommand.bind(null, ns, room)
     bus.on(`e:${ns}`, onRemoteEvent)

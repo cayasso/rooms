@@ -3,7 +3,6 @@
 const nanoid = require('nanoid')
 const UrlPattern = require('url-pattern')
 const { write } = require('@rooms/protocol')
-const pkg = require('../package.json')
 const config = require('../config')
 const { makeError, merge, parseUrl } = require('./utils')
 const createEngines = require('./engines')
@@ -75,11 +74,22 @@ module.exports = (options = {}) => {
     routes.set(route, [pattern, handler, options])
   }
 
-  const listen = (port, host) => {
+  const listen = (port, host, cb) => {
+    if (typeof port === 'function') {
+      cb = port
+      port = undefined
+      host = undefined
+    }
+
+    if (typeof host === 'function') {
+      cb = host
+      host = undefined
+    }
+
     if (port) options = { ...options, port }
     if (host) options = { ...options, host }
 
-    const server = createServer({ verifyClient, ...options })
+    const server = createServer({ verifyClient, ...options }, cb)
     const manage = createManager(server, options)
 
     server.on('connection', async (socket, { id = nanoid(12), ns, user, query, handler }) => {
@@ -93,16 +103,6 @@ module.exports = (options = {}) => {
       console.log('Server closed')
       options.engine.close()
     })
-
-    console.log('\n')
-    console.log('-----------------------------------------------------')
-    console.log(' SERVICE     : ' + pkg.name)
-    console.log(' PORT        : ' + options.port)
-    console.log(' VERSION     : ' + pkg.version)
-    console.log(' ENVIRONMENT : ' + options.env)
-    console.log(' STARTED     : ' + new Date())
-    console.log('-----------------------------------------------------')
-    console.log('\n')
   }
 
   return { room, listen }
