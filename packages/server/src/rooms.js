@@ -1,4 +1,5 @@
 const emitter = require('component-emitter')
+const { isFunction } = require('./utils')
 
 const createRoom = (ns, options = {}) => {
   const { send, sendError, roomTimeout } = options
@@ -10,7 +11,7 @@ const createRoom = (ns, options = {}) => {
   room.ns = ns
 
   room.auth = fn => {
-    if (typeof fn !== 'function') {
+    if (!isFunction(fn)) {
       return error('Invalid auth function')
     }
   }
@@ -45,7 +46,7 @@ const createRoom = (ns, options = {}) => {
   }
 
   room.sendError = (message, code, id) => {
-    if (code && typeof code !== 'number') {
+    if (code && !isNumber(code)) {
       id = code
       code = 400
     }

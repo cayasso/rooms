@@ -11,27 +11,8 @@ const makeLogger = require('debug')
  * @type public
  */
 
-const debug = ns => makeLogger(`rooms:${ns}`)
+const debug = (ns = '') => makeLogger(`rooms:${ns}`)
 const log = debug('error')
-
-/**
- * Get difference between two objects.
- *
- * @param {Object} o1
- * @param {Object} o2
- * @return {Object} diff
- * @type public
- */
-
-const diff = (o1, o2) => {
-  return Object.keys(o2).reduce((diff, key) => {
-    if (o1[key] === o2[key]) {
-      return diff
-    }
-
-    return { ...diff, [key]: o2[key] }
-  }, {})
-}
 
 /**
  * Make error.
@@ -138,9 +119,56 @@ const toBoolean = value => {
   return !/^(false|0)$/i.test(value) && Boolean(value)
 }
 
+/**
+ * Check if a given value is a function.
+ *
+ * @param {Function} value
+ * @return {Boolean}
+ * @public
+ */
+
+const isFunction = value => {
+  return typeof value === 'function'
+}
+
+/**
+ * Check if a given value is a string.
+ *
+ * @param {String} value
+ * @return {Boolean}
+ * @public
+ */
+
+const isString = value => {
+  return typeof value === 'string'
+}
+
+/**
+ * Check if a given value is a number.
+ *
+ * @param {String} value
+ * @return {Boolean}
+ * @public
+ */
+
+const isNumber = value => {
+  return typeof value === 'number'
+}
+
+/**
+ * Check if a given value is an object.
+ *
+ * @param {Object} value
+ * @return {Boolean}
+ * @public
+ */
+
+const isObject = value => {
+  return value !== null && typeof value === 'object'
+}
+
 module.exports = {
   log,
-  diff,
   merge,
   debug,
   sleep,
@@ -148,5 +176,9 @@ module.exports = {
   decode,
   parseUrl,
   toBoolean,
-  makeError
+  makeError,
+  isFunction,
+  isNumber,
+  isObject,
+  isString
 }

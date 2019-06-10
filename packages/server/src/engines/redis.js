@@ -40,8 +40,6 @@ module.exports = (options = {}) => {
     const key = `${ns}:d`
     const concurrency = await pub.incr(key)
 
-    // Pub.decr(key)
-
     if (concurrency > 1) {
       // Avoid having too long timeout if 10+ clients ask to join at the same time
       const timeout = Math.min(concurrency * 10, 4000)
@@ -52,21 +50,10 @@ module.exports = (options = {}) => {
     return true
   }
 
-  sub.on('ready', () => {
-    console.log('Redis Subscriber is connected')
-  })
-
   const close = () => {
     pub.disconnect()
     sub.disconnect()
   }
 
-  return {
-    delay,
-    subscribe,
-    unsubscribe,
-    publish,
-    exist,
-    close
-  }
+  return { delay, subscribe, unsubscribe, publish, exist, close }
 }

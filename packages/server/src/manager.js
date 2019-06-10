@@ -1,6 +1,8 @@
 'use strict'
 
 const { types, unpack, broadcast } = require('@rooms/protocol')
+const { debug } = require('./utils')
+const log = debug('manager')
 
 const createManager = (server, options) => {
   const { engine, transform, rooms, bus, terminateOnDispose, terminiateDisposeTimeout } = options
@@ -52,6 +54,7 @@ const createManager = (server, options) => {
     if (data.length > 2 && (type === EVENT || type === types.EVENT)) {
       const aud = data.pop()
       if (Array.isArray(aud) && aud.length > 0) {
+        log('broadcasting %s from %s to clients %j with %j', type, ns, aud, data)
         return aud.forEach(id => sendEvent(ns, type, data, id))
       }
 
@@ -62,8 +65,7 @@ const createManager = (server, options) => {
       setTimeout(terminate, terminiateDisposeTimeout, ns)
     }
 
-    console.log('BROADCAST ERROR', ns, type, data, id)
-
+    log('broadcasting %s to %s with %j', type, ns, data)
     return broadcast(server, ns, type, data, id, transform)
   }
 
@@ -91,7 +93,7 @@ const createManager = (server, options) => {
    */
 
   const onEvent = (ns, [type, ...data]) => {
-    console.log('ON EVENT ====>', ns, type, data)
+    log('outgoing event %s for %s with %j', type, ns, data)
     sendEvent(ns, type, type === EVENT ? [type, ...data] : data)
   }
 
@@ -107,7 +109,7 @@ const createManager = (server, options) => {
 
   const onCommand = async (ns, room, { type, id, data }) => {
     data = data || {}
-    console.log('incoming commands', type, id, data)
+    log('incoming command %s from %s with %j', type, id, data)
 
     try {
       switch (type) {
@@ -140,7 +142,6 @@ const createManager = (server, options) => {
    */
 
   const createRoom = async (ns, handler = () => {}) => {
-    console.log('loading room', ns)
     const room = await rooms(ns, { send: bus.send, sendError: bus.sendError })
     const onRemoteEvent = onEvent.bind(null, ns)
     const onRemoteCommand = onCommand.bind(null, ns, room)
@@ -171,7 +172,7 @@ const createManager = (server, options) => {
 
     if (user) data.user = user
 
-    // Send a join command to the room
+    log('client %s joining room %s with data %j', id, ns, data)
     sendCommand(ns, id, { type: types.JOIN, data })
     socket.on('close', () => sendCommand(ns, id, { type: types.LEAVE }))
     return socket.on('message', onMessage.bind(null, ns, id))

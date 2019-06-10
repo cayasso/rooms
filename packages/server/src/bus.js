@@ -37,6 +37,7 @@ module.exports = ({ engine }) => {
     engine.subscribe(`c:${ns}`, onRemoteCommand)
 
     return () => {
+      // Cleanup
       process.nextTick(() => {
         engine.unsubscribe(`e:${ns}`, onRemoteEvent)
         engine.unsubscribe(`c:${ns}`, onRemoteCommand)

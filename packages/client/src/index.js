@@ -11,10 +11,8 @@ const createRoom = (url, options = {}, WebSocket) => {
     socket.on('message', onMessage)
   }
 
-  const send = (event, data) => {
-    const payload = [event]
-    if (data) payload.push(data)
-    socket.send(types.DATA, payload)
+  const send = data => {
+    socket.send(types.DATA, data)
   }
 
   const args = (event, cb) => {

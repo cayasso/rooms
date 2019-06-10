@@ -1,7 +1,6 @@
 /* eslint no-undef: "off" */
 const createRoom = require('./src')
 
-// PAPARAS
 module.exports = (url, options) => {
   let WS = null
 

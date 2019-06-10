@@ -1,6 +1,8 @@
-module.exports = ({ room, ...args }) => {
-  room.on('join', id => {
-    console.log('JOINED', id)
+module.exports = (room, data) => {
+  console.log('CREATED', room, data)
+
+  room.on('join', (id, data) => {
+    console.log('JOINED', id, data)
     room.send({ message: 'hola mundo' }, id)
   })
 
@@ -9,10 +11,7 @@ module.exports = ({ room, ...args }) => {
   })
 
   room.on('data', (id, data) => {
-    console.log('DATA', data)
-    //room.sendError('Invalid', 400, id)
-
-    throw new Error('PATACON')
+    console.log('DATA', id, data)
   })
 
   room.on('dispose', (...args) => {

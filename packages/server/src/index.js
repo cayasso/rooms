@@ -4,23 +4,25 @@ const nanoid = require('nanoid')
 const UrlPattern = require('url-pattern')
 const { write } = require('@rooms/protocol')
 const config = require('../config')
-const { makeError, merge, parseUrl } = require('./utils')
-const createEngines = require('./engines')
+const { debug, makeError, merge, isString, isFunction, isObject } = require('./utils')
+const createEngine = require('./engines')
 const createManager = require('./manager')
 const createServer = require('./server')
 const createRooms = require('./rooms')
 const createBus = require('./bus')
+
+const log = debug()
 
 module.exports = (options = {}) => {
   options = { ...config, ...options }
   const { engine = 'memory' } = options
   const routes = new Map()
 
-  if (typeof engine === 'string') {
-    options.engine = createEngines(engine, options)
+  if (isString(engine)) {
+    options.engine = createEngine(engine, options)
   }
 
-  if (!options.engine || typeof options.engine !== 'object') {
+  if (!options.engine || !isObject(options.engine)) {
     throw makeError('Invalid engine provided')
   }
 
@@ -32,56 +34,19 @@ module.exports = (options = {}) => {
     options.rooms = createRooms(options)
   }
 
-  const findRoute = path => {
-    for (const [route, [pattern, handler, options]] of routes) {
-      const params = pattern.match(path)
-      if (params) {
-        return { params, route, handler, options, found: true }
-      }
-    }
-  }
-
-  const verifyClient = async ({ req }, next) => {
-    try {
-      const { pathname: ns, query: qs } = parseUrl(req)
-      const { token, ...query } = qs
-      const foundRoute = findRoute(ns)
-      if (!foundRoute) throw makeError('Not found', 404)
-
-      const { route, handler, params = {}, options = {} } = foundRoute
-      const data = { query, params, route, ns }
-
-      if (options.auth) {
-        try {
-          req.user = await options.auth(token)
-        } catch (error) {
-          throw makeError(error.message, error.code || 401)
-        }
-      }
-
-      req.query = query
-      req.ns = ns
-      req.handler = room => handler({ ...data, room })
-      next(true)
-    } catch (error) {
-      console.log(error.message)
-      next(false, error.code || 400, error.message || 'Unknown error')
-    }
-  }
-
   const room = (route, handler, options = {}) => {
     const pattern = new UrlPattern(route)
     routes.set(route, [pattern, handler, options])
   }
 
   const listen = (port, host, cb) => {
-    if (typeof port === 'function') {
+    if (isFunction(port)) {
       cb = port
       port = undefined
       host = undefined
     }
 
-    if (typeof host === 'function') {
+    if (isFunction(host)) {
       cb = host
       host = undefined
     }
@@ -89,18 +54,18 @@ module.exports = (options = {}) => {
     if (port) options = { ...options, port }
     if (host) options = { ...options, host }
 
-    const server = createServer({ verifyClient, ...options }, cb)
+    const server = createServer(routes, options, cb)
     const manage = createManager(server, options)
 
     server.on('connection', async (socket, { id = nanoid(12), ns, user, query, handler }) => {
       merge(socket, { id, ns, user, query })
       write(socket, 'id', { id, ns })
       manage(socket, handler)
-      console.log('client connecting', socket.id)
+      log('client connected', socket.id)
     })
 
     server.on('close', () => {
-      console.log('Server closed')
+      log('server closed')
       options.engine.close()
     })
   }

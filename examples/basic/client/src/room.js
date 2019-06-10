@@ -21,10 +21,6 @@ export const RoomProvider = ({ url, params, children }) => {
 
     room.current = createRoom(url, { params })
 
-    // room.current.on('connect', () => {
-    //   setOnline(true)
-    // })
-
     room.current.on('ready', () => {
       setOnline(true)
     })
