@@ -1,5 +1,5 @@
 const emitter = require('component-emitter')
-const { isFunction } = require('./utils')
+const { isFunction, isNumber } = require('./utils')
 
 const createRoom = (ns, options = {}) => {
   const { send, sendError, roomTimeout } = options

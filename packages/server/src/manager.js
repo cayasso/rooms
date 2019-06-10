@@ -2,6 +2,7 @@
 
 const { types, unpack, broadcast } = require('@rooms/protocol')
 const { debug } = require('./utils')
+
 const log = debug('manager')
 
 const createManager = (server, options) => {
