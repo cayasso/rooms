@@ -1,6 +1,6 @@
 {
   "name": "@rooms/protocol",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Rooms protocol",
   "author": "Jonathan Brumley <cayasso@gmail.com>",
   "main": "index.js",
