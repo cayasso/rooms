@@ -3,7 +3,7 @@ module.exports = (room, data) => {
 
   room.on('join', (id, data) => {
     console.log('JOINED', id, data)
-    room.send({ message: 'hola mundo' }, id)
+    room.send({ message: 'hello world' }, id)
   })
 
   room.on('leave', (...args) => {

@@ -9,8 +9,8 @@ const createManager = (server, options) => {
   const { engine, transform, rooms, bus, terminateOnDispose, terminiateDisposeTimeout } = options
   const EVENT = 'event'
   const DISPOSE = 'dispose'
-  const DEFAULT_ERROR_CODE = 400
   const DEFAULT_ERROR_MESSAGE = 'Unknown error'
+  const DEFAULT_ERROR_CODE = 400
 
   /**
    * Send command to room via redis.
