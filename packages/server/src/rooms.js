@@ -42,7 +42,7 @@ const createRoom = (ns, options = {}) => {
   }
 
   room.send = (...args) => {
-    send(...[ns, ...args])
+    send(ns, ...args)
   }
 
   room.sendError = (message, code, id) => {

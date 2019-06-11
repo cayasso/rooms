@@ -85,6 +85,12 @@ const createRoom = (url, options = {}, WebSocket) => {
 
   const onEvent = ([event, data, userId]) => {
     if (!event) return
+
+    if (RESTRICTED_EVENTS[event]) {
+      console.log(`Restricted event ${event}`)
+      return
+    }
+
     socket.emit(event, data, userId)
   }
 

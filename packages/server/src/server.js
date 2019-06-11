@@ -76,7 +76,7 @@ module.exports = (routes, options = {}, cb) => {
   const server = new WebSocketServer({ ...options, verifyClient }, cb)
   server.clients = []
 
-  server.on('connection', async socket => {
+  server.on('connection', async (socket, ...args) => {
     server.clients.push(socket)
 
     socket.on('close', () => {
@@ -85,10 +85,17 @@ module.exports = (routes, options = {}, cb) => {
       server.clients.splice(i, 1)
     })
 
+    server.emit('connect', socket, ...args)
+
     // Important for keep alive
     socket.on('pong', () => {
       socket.isAlive = true
     })
+  })
+
+  server.on('close', () => {
+    log('server closed')
+    options.engine.close()
   })
 
   server.startAutoPing(pingInterval, true)

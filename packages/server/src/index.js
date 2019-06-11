@@ -57,16 +57,11 @@ module.exports = (options = {}) => {
     const server = createServer(routes, options, cb)
     const manage = createManager(server, options)
 
-    server.on('connection', async (socket, { id = nanoid(12), ns, user, query, handler }) => {
+    server.on('connect', async (socket, { id = nanoid(12), ns, user, query, handler }) => {
       merge(socket, { id, ns, user, query })
       write(socket, 'id', { id, ns })
       manage(socket, handler)
       log('client connected', socket.id)
-    })
-
-    server.on('close', () => {
-      log('server closed')
-      options.engine.close()
     })
   }
 
