@@ -1,6 +1,20 @@
 const { types } = require('@rooms/protocol')
 const createSocket = require('./socket')
 
+const RESTRICTED_EVENTS = {
+  reconnect: 1,
+  connect: 1,
+  message: 1,
+  dispose: 1,
+  ready: 1,
+  close: 1,
+  error: 1,
+  leave: 1,
+  join: 1,
+  data: 1,
+  ping: 1
+}
+
 const createRoom = (url, options = {}, WebSocket) => {
   let socket = null
 
@@ -32,6 +46,14 @@ const createRoom = (url, options = {}, WebSocket) => {
   const off = (type, fn) => {
     const [event, cb] = args(type, fn)
     socket.off(event, cb)
+  }
+
+  const emit = (id, ...args) => {
+    if (RESTRICTED_EVENTS[id]) {
+      throw new Error(`Restricted event ${id}`)
+    }
+
+    socket.emit(id, ...args)
   }
 
   const close = () => {
@@ -77,6 +99,7 @@ const createRoom = (url, options = {}, WebSocket) => {
   return {
     on,
     off,
+    emit,
     send,
     close,
     connect,
