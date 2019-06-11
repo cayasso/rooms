@@ -59,7 +59,7 @@ module.exports = (routes, options = {}, cb) => {
 
       await verifyToken(req, token, opt)
 
-      merge(req, { ns, query, handler: room => handler(room, data) })
+      merge(req, { ns, query, params, handler: room => handler(room, data) })
 
       if (options.verifyClient) {
         options.verifyClient(req)
