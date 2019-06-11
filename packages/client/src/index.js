@@ -64,14 +64,12 @@ const createRoom = (url, options = {}, WebSocket) => {
     switch (type) {
       case types.DATA:
         return onData(data)
-      case types.EVENT:
-        return onEvent(data)
       case types.JOIN:
-        return onEvent(['join', ...data])
+        return onEvent('join', data)
       case types.LEAVE:
-        return onEvent(['leave', ...data])
+        return onEvent('leave', data)
       case types.DISPOSE:
-        return onEvent(['dispose', ...data])
+        return onEvent('dispose', data)
       case types.ERROR:
         return onError(data)
       default:
@@ -83,15 +81,8 @@ const createRoom = (url, options = {}, WebSocket) => {
     socket.emit('data', data)
   }
 
-  const onEvent = ([event, data, userId]) => {
-    if (!event) return
-
-    if (RESTRICTED_EVENTS[event]) {
-      console.log(`Restricted event ${event}`)
-      return
-    }
-
-    socket.emit(event, data, userId)
+  const onEvent = (event, data, id) => {
+    socket.emit(event, data, id)
   }
 
   const onError = ([message, code]) => {

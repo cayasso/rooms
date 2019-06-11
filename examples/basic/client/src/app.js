@@ -15,9 +15,18 @@ const Room = () => {
   useEffect(() => {
     if (!online) return
 
-    return room.on((type, data) => {
-      console.log('incoming event', type, data)
+    const unbind1 = room.on('data', (type, data) => {
+      console.log('incoming data', type, data)
     })
+
+    const unbind2 = room.on('error', (type, data) => {
+      console.log('incoming error', type, data)
+    })
+
+    return () => {
+      unbind1()
+      unbind2()
+    }
   }, [online, room])
 
   const onMessage = () => {

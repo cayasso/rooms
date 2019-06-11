@@ -9,7 +9,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@clusterws/cws": "^0.14.0",
+    "@clusterws/cws": "^0.15.0",
     "@rooms/protocol": "^0.0.10",
     "component-emitter": "^1.3.0",
     "debug": "^4.1.1",

@@ -2,7 +2,7 @@ const emitter = require('component-emitter')
 const { isFunction, isNumber } = require('./utils')
 
 const createRoom = (ns, options = {}) => {
-  const { send, sendError, roomTimeout } = options
+  const { bus, roomTimeout } = options
   const room = emitter({})
   const socks = new Map()
 
@@ -41,19 +41,38 @@ const createRoom = (ns, options = {}) => {
     timer = setTimeout(room.dispose, roomTimeout)
   }
 
-  room.send = (...args) => {
-    send(ns, ...args)
-  }
-
-  room.sendError = (message, code, id) => {
-    if (code && !isNumber(code)) {
-      id = code
-      code = 400
+  room.send = (to, data) => {
+    if (to && !data) {
+      data = to
+      to = []
     }
 
-    const args = [ns, message, code]
-    if (id) args.push(id)
-    sendError(...args)
+    bus.sendData({ data, to })
+  }
+
+  room.sendError = (to, message, code = 400) => {
+    if (to && !message) {
+      message = to
+      to = []
+    }
+
+    if (message && isNumber(message)) {
+      code = message
+      message = to
+      to = []
+    }
+
+    bus.sendError({ data: [message, code], to })
+  }
+
+  room.to = to => {
+    if (!Array.isArray(to)) to = [to]
+    return { send: data => bus.sendData({ data, to }) }
+  }
+
+  room.not = not => {
+    if (!Array.isArray(not)) not = [not]
+    return { send: data => bus.sendData({ data, not }) }
   }
 
   room.dispose = () => {

@@ -1,4 +1,6 @@
+const nanoid = require('nanoid')
 const Emitter = require('component-emitter')
+const { write } = require('@rooms/protocol')
 const { WebSocketServer } = require('@clusterws/cws')
 const { makeError, merge, parseUrl, isFunction, debug } = require('./utils')
 
@@ -75,22 +77,29 @@ module.exports = (routes, options = {}, cb) => {
 
   const server = new WebSocketServer({ ...options, verifyClient }, cb)
   server.clients = []
+  server.ids = {}
 
-  server.on('connection', async (socket, ...args) => {
+  server.on('connection', async (socket, req) => {
+    const { id = nanoid(12), ns, user, query } = req
     server.clients.push(socket)
+    server.ids[id] = socket
+
+    merge(socket, { id, ns, user, query })
+    write(socket, 'id', { id, ns })
 
     socket.on('close', () => {
-      socket.removeAllListeners()
+      socket.emit('disconnect')
       const i = server.clients.findIndex(c => c === socket)
       server.clients.splice(i, 1)
+      delete server.ids[socket.id]
     })
-
-    server.emit('connect', socket, ...args)
 
     // Important for keep alive
     socket.on('pong', () => {
       socket.isAlive = true
     })
+
+    server.emit('connect', socket, req)
   })
 
   server.on('close', () => {

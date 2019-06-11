@@ -6,11 +6,10 @@ const CLOSED = 0
 const types = {
   ID: 1,
   DATA: 2,
-  EVENT: 3,
-  ERROR: 4,
-  JOIN: 5,
-  LEAVE: 6,
-  DISPOSE: 7,
+  ERROR: 3,
+  JOIN: 4,
+  LEAVE: 5,
+  DISPOSE: 6,
   PING: 57,
   PONG: new Uint8Array(['A'.charCodeAt()])
 }
@@ -104,8 +103,10 @@ const unpack = payload => {
 const write = (socket, type, data, packed) => {
   if (!socket || socket.readyState !== OPEN) return
   type = getType(type)
+
   if (!type) return
   const payload = packed ? data : packet(type, data)
+
   return socket.send(payload)
 }
 
@@ -116,31 +117,37 @@ const write = (socket, type, data, packed) => {
  * @params {String} ns
  * @params {String|Number} type
  * @params {Object} data
- * @params {Function} [transform]
+ * @params {Object} [transform]
  * @return {Void}
  * @public
  */
 
-const broadcast = (server, ns, type, data, id, transform) => {
+const broadcast = (server, ns, type, data, { to, not, transform } = {}) => {
   if (!server || !ns || !type) return
+
+  to = to || []
+  not = not || []
+
+  if (!Array.isArray(to)) to = [to]
+  if (!Array.isArray(not)) not = [not]
+
   type = getType(type)
   if (!type) return
 
   const toTransform = isFunction(transform)
   data = toTransform ? data : packet(type, data)
+  not = not.reduce((ids, id) => ({ ...ids, [id]: 1 }), {})
 
   const send = socket => {
     if (toTransform) data = transform(data, socket, type)
     if (data) write(socket, type, data, !toTransform)
   }
 
-  if (id) {
-    return send(server.clients.find(socket => socket.id === id))
-  }
-
-  server.clients.forEach(socket => {
-    if (socket.ns === ns) send(socket)
-  })
+  return to.length > 0
+    ? to.forEach(id => send(server.ids[id]))
+    : server.clients.forEach(socket => {
+        if (socket.ns === ns && !not[socket.id]) send(socket)
+      })
 }
 
 module.exports = {

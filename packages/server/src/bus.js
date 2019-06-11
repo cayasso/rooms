@@ -1,51 +1,67 @@
 const emitter = require('component-emitter')
+const { types } = require('@rooms/protocol')
 
 module.exports = ({ engine }) => {
-  const bus = emitter({})
+  const cache = new Map()
 
-  const onEvent = (ns, data) => {
-    bus.emit(`e:${ns}`, data)
-  }
+  return ns => {
+    if (cache.has(ns)) return cache.get(ns)
 
-  const onCommand = async (ns, data) => {
-    bus.emit(`c:${ns}`, data)
-  }
+    const bus = emitter({})
 
-  bus.send = (ns, ...args) => {
-    bus.publish(ns, 'event', ...args)
-  }
+    const bind = () => {
+      engine.subscribe(`e:${ns}`, onEvent)
+      engine.subscribe(`c:${ns}`, onCommand)
 
-  bus.sendError = (ns, ...args) => {
-    bus.publish(ns, 'error', ...args)
-  }
-
-  bus.publish = (ns, type, ...args) => {
-    engine.publish(`e:${ns}`, [type, ...args])
-  }
-
-  bus.call = (ns, id, data) => {
-    engine.publish(`c:${ns}`, { ...data, id })
-  }
-
-  bus.bind = ns => {
-    // Bind event and command handler
-    const onRemoteEvent = onEvent.bind(null, ns)
-    const onRemoteCommand = onCommand.bind(null, ns)
-
-    // Subscribe to event and command channels
-    engine.subscribe(`e:${ns}`, onRemoteEvent)
-    engine.subscribe(`c:${ns}`, onRemoteCommand)
-
-    return () => {
-      // Cleanup
-      process.nextTick(() => {
-        engine.unsubscribe(`e:${ns}`, onRemoteEvent)
-        engine.unsubscribe(`c:${ns}`, onRemoteCommand)
-        bus.removeAllListeners(`e:${ns}`)
-        bus.removeAllListeners(`c:${ns}`)
-      })
+      return () => {
+        process.nextTick(() => {
+          engine.unsubscribe(`e:${ns}`, onEvent)
+          engine.unsubscribe(`c:${ns}`, onCommand)
+          bus.removeAllListeners()
+        })
+      }
     }
-  }
 
-  return bus
+    const onEvent = data => {
+      bus.emit('event', data)
+    }
+
+    const onCommand = async data => {
+      bus.emit('command', data)
+    }
+
+    bus.send = (type, data = {}, to = [], not = []) => {
+      engine.publish(`e:${ns}`, [type, data, to, not])
+    }
+
+    bus.call = (id, data) => {
+      engine.publish(`c:${ns}`, { ...data, id })
+    }
+
+    bus.sendJoin = data => {
+      bus.send(types.JOIN, data)
+    }
+
+    bus.sendData = ({ data, to, not }) => {
+      bus.send(types.DATA, data, to, not)
+    }
+
+    bus.sendLeave = data => {
+      bus.send(types.LEAVE, data)
+    }
+
+    bus.sendError = ({ data, to, not }) => {
+      bus.send(types.ERROR, data, to, not)
+    }
+
+    bus.dispose = () => {
+      bus.send(types.DISPOSE)
+      process.nextTick(() => unbind(cache.delete(ns)))
+    }
+
+    const unbind = bind()
+    cache.set(ns, bus)
+
+    return bus
+  }
 }

@@ -2,9 +2,9 @@ const { unpack, types, write } = require('@rooms/protocol')
 
 const createSocket = (url, options = {}, WebSocket) => {
   let ws = null
+  let timer = null
   let attempt = 0
   let online = false
-  let timer = null
 
   const fns = new Map()
   const { token, timeout = 1e3, attempts = Infinity, pingInterval = 10000, params = {} } = options
@@ -67,7 +67,7 @@ const createSocket = (url, options = {}, WebSocket) => {
 
   const off = (id, fn) => {
     if (!fn) return fns.delete(id)
-    fns.set(id, fns.get(id).filter(cb => cb !== fn))
+    if (fns.has(id)) fns.set(id, fns.get(id).filter(cb => cb !== fn))
   }
 
   const emit = (id, ...args) => {
