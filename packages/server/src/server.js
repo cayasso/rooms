@@ -75,6 +75,10 @@ module.exports = (routes, options = {}, cb) => {
     }
   }
 
+  if (options.server) {
+    delete options.port
+  }
+
   const server = new WebSocketServer({ ...options, verifyClient }, cb)
   server.clients = []
   server.ids = {}

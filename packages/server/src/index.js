@@ -32,6 +32,18 @@ module.exports = (options = {}) => {
     routes.set(route, [pattern, handler, options])
   }
 
+  const create = (options, cb) => {
+    const server = createServer(routes, { ...options }, cb)
+    const manage = createManager(server, options)
+
+    server.on('connect', async (socket, { handler }) => {
+      manage(socket, handler)
+      log('client connected', socket.id)
+    })
+
+    return server
+  }
+
   const listen = (port, host, cb) => {
     if (isFunction(port)) {
       cb = port
@@ -47,14 +59,13 @@ module.exports = (options = {}) => {
     if (port) options = { ...options, port }
     if (host) options = { ...options, host }
 
-    const server = createServer(routes, options, cb)
-    const manage = createManager(server, options)
-
-    server.on('connect', async (socket, { handler }) => {
-      manage(socket, handler)
-      log('client connected', socket.id)
-    })
+    return create(options, cb)
   }
 
-  return { room, listen }
+  const attach = server => {
+    create({ ...options, server })
+    return server
+  }
+
+  return { room, attach, listen }
 }
