@@ -1,6 +1,6 @@
 {
   "name": "@rooms/client",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Rooms client",
   "author": "Jonathan Brumley <cayasso@gmail.com>",
   "main": "./node.js",
@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@rooms/protocol": "^0.0.11"
+    "@rooms/protocol": "^0.0.12"
   },
   "peerDependencies": {
     "@clusterws/cws": "^0.15.0"

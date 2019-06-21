@@ -1,9 +1,9 @@
 {
   "name": "@rooms/micro-client",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "private": true,
   "dependencies": {
-    "@rooms/client": "^0.0.11",
+    "@rooms/client": "^0.0.12",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1"
