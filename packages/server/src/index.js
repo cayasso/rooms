@@ -37,7 +37,7 @@ module.exports = (options = {}) => {
       route = '/'
     }
 
-    if (isFunction(handler)) {
+    if (!isFunction(handler)) {
       throw makeError('Invalid room handler')
     }
 
