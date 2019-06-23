@@ -28,6 +28,23 @@ module.exports = (options = {}) => {
   }
 
   const room = (route, handler, options = {}) => {
+    if (isFunction(route)) {
+      if (isObject(handler)) {
+        options = handler
+      }
+
+      handler = route
+      route = '/'
+    }
+
+    if (isFunction(handler)) {
+      throw makeError('Invalid room handler')
+    }
+
+    if (!isObject(options)) {
+      throw makeError('Invalid room options')
+    }
+
     const pattern = new UrlPattern(route)
     routes.set(route, [pattern, handler, options])
   }

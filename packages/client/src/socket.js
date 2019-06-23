@@ -16,7 +16,8 @@ const createSocket = (url, options = {}, WebSocket) => {
   }
 
   const connect = () => {
-    const socketUrl = url + '?' + toQs({ ...params, token })
+    if (token) params.token = token
+    const socketUrl = url + '?' + toQs(params)
     ws = new WebSocket(socketUrl)
     ws.binaryType = 'arraybuffer'
     ws.addEventListener('message', onMessage)
