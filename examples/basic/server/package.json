@@ -1,11 +1,11 @@
 {
   "name": "@rooms/basic-server",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "private": true,
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "@rooms/server": "^0.0.15"
+    "@rooms/server": "^0.0.16"
   }
 }
