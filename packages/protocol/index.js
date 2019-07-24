@@ -138,15 +138,15 @@ const broadcast = (server, ns, type, data, { to, not, transform } = {}) => {
   data = toTransform ? data : packet(type, data)
   not = not.reduce((ids, id) => ({ ...ids, [id]: 1 }), {})
 
-  const send = socket => {
+  const send = (socket, data) => {
     if (toTransform) data = transform(data, socket, type)
     if (data) write(socket, type, data, !toTransform)
   }
 
   return to.length > 0
-    ? to.forEach(id => send(server.ids[id]))
+    ? to.forEach(id => send(server.ids[id], data))
     : server.clients.forEach(socket => {
-        if (socket.ns === ns && !not[socket.id]) send(socket)
+        if (socket.ns === ns && !not[socket.id]) send(socket, data)
       })
 }
 
