@@ -48,7 +48,7 @@ module.exports = (routes, options = {}, cb) => {
     if (!options.auth) return
     log('verifying token', token)
     try {
-      req.user = await options.auth(token)
+      req.user = await options.auth(token, req)
     } catch (error) {
       throw makeError(error.message || 'Invalid token', error.code || 401)
     }
