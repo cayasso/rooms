@@ -59,9 +59,9 @@ module.exports = (routes, options = {}, cb) => {
       const { ns, route, handler, params, query, token, options: opt } = verifyRoute(req)
       const data = { ns, route, params, query }
 
-      await verifyToken(req, token, opt)
-
       merge(req, { ns, query, params, handler: room => handler(room, data) })
+
+      await verifyToken(req, token, opt)
 
       if (options.verifyClient) {
         options.verifyClient(req)
@@ -88,8 +88,12 @@ module.exports = (routes, options = {}, cb) => {
     server.clients.push(socket)
     server.ids[id] = socket
 
+    const remote = { id, ns, user }
+
+    if (user) remote.user = user
+
     merge(socket, { id, ns, user, query })
-    write(socket, 'id', { id, ns })
+    write(socket, 'id', remote)
 
     socket.on('close', () => {
       socket.emit('disconnect')
