@@ -41,7 +41,7 @@ const createSocket = (url, options = {}, WebSocket) => {
 
     if (type === types.ID) {
       Object.assign(ws, data)
-      return emit('ready')
+      return emit('ready', data)
     }
 
     emit('message', { type, data })
