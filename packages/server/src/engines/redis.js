@@ -3,17 +3,16 @@
 const Redis = require('ioredis')
 const { sleep, encode, decode } = require('../utils')
 
-module.exports = (options = {}) => {
-  const sub = new Redis(options)
-  const pub = new Redis(options)
+module.exports = ({ url, ...options } = {}) => {
+  const args = url ? [url, options] : [options]
+  const sub = new Redis(...args)
+  const pub = new Redis(...args)
+
   const fns = {}
 
   const subscribe = (ns, fn) => {
     fns[ns] = (ch, msg) => {
-      if (ns !== ch) {
-        return
-      }
-
+      if (ns !== ch) return
       fn(decode(msg))
     }
 
