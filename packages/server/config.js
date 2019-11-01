@@ -11,8 +11,9 @@ module.exports = rc('rooms', {
     host: process.env.REDIS_HOST || '127.0.0.1',
     password: process.env.REDIS_PASSWORD || ''
   },
-  roomTimeout: ms(process.env.ROOM_TIMEOUT || '10s'),
-  terminiateDisposeTimeout: ms(process.env.TERMINATE_DISPOSE_TIMEOUT || '10s'),
+  roomTimeout: ms(process.env.ROOM_TIMEOUT || '30s'),
+  terminateDisposeTimeout: ms(process.env.TERMINATE_DISPOSE_TIMEOUT || '30s'),
   terminateOnDispose: toBoolean(process.env.TERMINATE_ON_DISPOSE || true),
+  disableRoomTimeout: toBoolean(process.env.DISABLE_ROOM_TIMEOUT || false),
   wsEngine: 'cws'
 })

@@ -1,8 +1,7 @@
 const emitter = require('component-emitter')
 const { isFunction, isNumber } = require('./utils')
 
-const createRoom = (ns, options = {}) => {
-  const { bus, roomTimeout } = options
+const createRoom = (ns, { bus, roomTimeout, disableRoomTimeout } = {}) => {
   const room = emitter({})
   const socks = new Map()
 
@@ -37,7 +36,7 @@ const createRoom = (ns, options = {}) => {
 
     socks.delete(id)
     room.emit('leave', id)
-    if (socks.size > 0) return
+    if (socks.size > 0 || disableRoomTimeout) return
     timer = setTimeout(room.dispose, roomTimeout)
   }
 

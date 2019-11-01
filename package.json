@@ -13,8 +13,8 @@
   },
   "devDependencies": {
     "ava": "^2.4.0",
-    "eslint-config-prettier": "^6.3.0",
-    "lerna": "^3.16.4",
+    "eslint-config-prettier": "^6.5.0",
+    "lerna": "^3.18.3",
     "pre-commit": "^1.2.2",
     "xo": "^0.24.0"
   },

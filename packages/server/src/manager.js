@@ -7,7 +7,7 @@ const createBus = require('./bus')
 const log = debug('manager')
 
 const createManager = (server, options) => {
-  const { engine, transform, rooms, terminateOnDispose, terminiateDisposeTimeout } = options
+  const { engine, transform, rooms, terminateOnDispose, terminateDisposeTimeout } = options
   const DEFAULT_ERROR_MESSAGE = 'Unknown error'
   const DEFAULT_ERROR_CODE = 400
   const getBus = createBus(options)
@@ -18,7 +18,7 @@ const createManager = (server, options) => {
 
   const sendEvent = (ns, type, data, to = [], not = []) => {
     if (type === types.DISPOSE && terminateOnDispose) {
-      setTimeout(terminate, terminiateDisposeTimeout, ns)
+      setTimeout(terminate, terminateDisposeTimeout, ns)
     }
 
     log('broadcasting %s to %s with %j', type, ns, data, to, not)
