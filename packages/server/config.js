@@ -15,5 +15,5 @@ module.exports = rc('rooms', {
   terminateDisposeTimeout: ms(process.env.TERMINATE_DISPOSE_TIMEOUT || '30s'),
   terminateOnDispose: toBoolean(process.env.TERMINATE_ON_DISPOSE || true),
   disableRoomTimeout: toBoolean(process.env.DISABLE_ROOM_TIMEOUT || false),
-  wsEngine: 'cws'
+  wsEngine: 'ws'
 })
