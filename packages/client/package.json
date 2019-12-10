@@ -12,7 +12,8 @@
     "@rooms/protocol": "^0.0.21"
   },
   "peerDependencies": {
-    "@clusterws/cws": "^0.15.2"
+    "@clusterws/cws": "^0.16.0",
+    "ws": "^7.2.0"
   },
   "repository": {
     "type": "git",
@@ -25,5 +26,9 @@
   "homepage": "https://github.com/cayasso/rooms#readme",
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "@clusterws/cws": "^0.16.0",
+    "ws": "^7.2.0"
   }
 }

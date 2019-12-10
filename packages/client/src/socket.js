@@ -35,7 +35,7 @@ const createSocket = (url, options = {}, WebSocket) => {
     const { type, data } = unpack(payload)
 
     if (type === types.PING) {
-      ws.send(types.PONG)
+      send(types.PONG)
       return resetPing(emit('ping'))
     }
 
@@ -68,7 +68,11 @@ const createSocket = (url, options = {}, WebSocket) => {
 
   const off = (id, fn) => {
     if (!fn) return fns.delete(id)
-    if (fns.has(id)) fns.set(id, fns.get(id).filter(cb => cb !== fn))
+    if (fns.has(id))
+      fns.set(
+        id,
+        fns.get(id).filter(cb => cb !== fn)
+      )
   }
 
   const emit = (id, ...args) => {

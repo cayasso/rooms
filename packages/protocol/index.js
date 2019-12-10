@@ -10,8 +10,8 @@ const types = {
   JOIN: 4,
   LEAVE: 5,
   DISPOSE: 6,
-  PING: 57,
-  PONG: new Uint8Array(['A'.charCodeAt()])
+  PING: 9,
+  PONG: 10
 }
 
 const hasArrayBuffer = typeof ArrayBuffer === 'function'
@@ -86,6 +86,7 @@ const unpack = payload => {
   }
 
   const [type, data] = payload
+
   return { type, data }
 }
 
@@ -106,7 +107,6 @@ const write = (socket, type, data, packed) => {
 
   if (!type) return
   const payload = packed ? data : packet(type, data)
-
   return socket.send(payload)
 }
 

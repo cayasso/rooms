@@ -26,6 +26,7 @@ const createRoom = (url, options = {}, WebSocket) => {
   }
 
   const send = data => {
+    console.log('SENDDDDSDSDS')
     socket.send(types.DATA, data)
   }
 

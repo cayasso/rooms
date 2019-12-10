@@ -1,7 +1,7 @@
+const WebSocket = require('ws')
 const nanoid = require('nanoid')
 const Emitter = require('component-emitter')
 const { write } = require('@rooms/protocol')
-const { WebSocketServer } = require('@clusterws/cws')
 const { makeError, merge, parseUrl, isFunction, debug } = require('./utils')
 
 const log = debug('server')
@@ -12,6 +12,15 @@ global.cws = {
 
 module.exports = (routes, options = {}, cb) => {
   const { pingInterval = 5000 } = options
+  let WebSocketServer = WebSocket.Server
+
+  if (options.wsEngine === 'cws') {
+    try {
+      WebSocketServer = require('@clusterws/cws').WebSocketServer
+    } catch (error) {
+      throw makeError('@clusterws/cws is not installed. Please install to use `cws` engine')
+    }
+  }
 
   if (!options.routeMatch) {
     options.routeMatch = (pattern, path) => pattern.match(path)
@@ -50,6 +59,7 @@ module.exports = (routes, options = {}, cb) => {
     try {
       req.user = await options.auth(token, req)
     } catch (error) {
+      console.log('ERROR', error)
       throw makeError(error.message || 'Invalid token', error.code || 401)
     }
   }
@@ -80,14 +90,17 @@ module.exports = (routes, options = {}, cb) => {
   }
 
   const server = new WebSocketServer({ ...options, verifyClient }, cb)
-  server.clients = []
+  server.clients = server.clients || []
   server.ids = {}
 
   server.on('connection', async (socket, req) => {
     const { id = nanoid(12), ns, user, query } = req
-    server.clients.push(socket)
-    server.ids[id] = socket
 
+    if (options.wsEngine === 'cws') {
+      server.clients.push(socket)
+    }
+
+    server.ids[id] = socket
     const remote = { id, ns, user }
 
     if (user) remote.user = user
@@ -97,12 +110,17 @@ module.exports = (routes, options = {}, cb) => {
 
     socket.on('close', () => {
       socket.emit('disconnect')
-      const i = server.clients.findIndex(c => c === socket)
-      server.clients.splice(i, 1)
+
+      if (options.wsEngine === 'cws') {
+        const i = server.clients.findIndex(c => c === socket)
+        server.clients.splice(i, 1)
+      }
+
       delete server.ids[socket.id]
     })
 
-    // Important for keep alive
+    socket.isAlive = true
+
     socket.on('pong', () => {
       socket.isAlive = true
     })
@@ -110,12 +128,18 @@ module.exports = (routes, options = {}, cb) => {
     server.emit('connect', socket, req)
   })
 
+  setInterval(() => {
+    server.clients.forEach(socket => {
+      if (socket.isAlive === false) return socket.terminate()
+      socket.isAlive = false
+      write(socket, 'ping')
+    })
+  }, pingInterval)
+
   server.on('close', () => {
     log('server closed')
     options.engine.close()
   })
-
-  server.startAutoPing(pingInterval, true)
 
   return server
 }

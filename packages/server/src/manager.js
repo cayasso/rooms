@@ -31,8 +31,14 @@ const createManager = (server, options) => {
     })
   }
 
-  const onMessage = (ns, id, data) => {
-    sendCommand(ns, id, unpack(data) || {})
+  const onMessage = (socket, ns, id, data) => {
+    const msg = unpack(data) || {}
+
+    if (msg.type === types.PONG) {
+      return socket.emit('pong', msg.data)
+    }
+
+    sendCommand(ns, id, msg)
   }
 
   const onEvent = (room, [type, data, to, not]) => {
@@ -91,7 +97,7 @@ const createManager = (server, options) => {
     log('client %s joining room %s with data %j', id, ns, data)
     sendCommand(ns, id, { type: types.JOIN, data })
     socket.on('disconnect', () => sendCommand(ns, id, { type: types.LEAVE }))
-    return socket.on('message', onMessage.bind(null, ns, id))
+    return socket.on('message', onMessage.bind(null, socket, ns, id))
   }
 }
 
