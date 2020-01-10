@@ -12,8 +12,8 @@
     "@rooms/protocol": "^0.1.0"
   },
   "peerDependencies": {
-    "@clusterws/cws": "^0.16.0",
-    "ws": "^7.2.0"
+    "@clusterws/cws": "^1.1.1",
+    "ws": "^7.2.1"
   },
   "repository": {
     "type": "git",
@@ -28,7 +28,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@clusterws/cws": "^0.16.0",
-    "ws": "^7.2.0"
+    "@clusterws/cws": "^1.1.1",
+    "ws": "^7.2.1"
   }
 }

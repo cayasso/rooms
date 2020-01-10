@@ -14,13 +14,13 @@
     "debug": "^4.1.1",
     "ioredis": "^4.14.1",
     "ms": "^2.1.2",
-    "nanoid": "^2.1.6",
+    "nanoid": "^2.1.9",
     "rc": "^1.2.8",
     "url-pattern": "^1.0.3",
-    "ws": "^7.2.0"
+    "ws": "^7.2.1"
   },
   "peerDependencies": {
-    "@clusterws/cws": "^0.16.0"
+    "@clusterws/cws": "^1.1.1"
   },
   "repository": {
     "type": "git",

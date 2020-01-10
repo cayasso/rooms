@@ -16,7 +16,8 @@ module.exports = (routes, options = {}, cb) => {
 
   if (options.wsEngine === 'cws') {
     try {
-      WebSocketServer = require('@clusterws/cws').WebSocketServer
+      const { WebSocket: cws } = require('@clusterws/cws')
+      WebSocketServer = cws.Server
     } catch (error) {
       throw makeError('@clusterws/cws is not installed. Please install to use `cws` engine')
     }
@@ -90,16 +91,10 @@ module.exports = (routes, options = {}, cb) => {
   }
 
   const server = new WebSocketServer({ ...options, verifyClient }, cb)
-  server.clients = server.clients || []
   server.ids = {}
 
   server.on('connection', async (socket, req) => {
     const { id = nanoid(12), ns, user, query } = req
-
-    if (options.wsEngine === 'cws') {
-      server.clients.push(socket)
-    }
-
     server.ids[id] = socket
     const remote = { id, ns, user }
 
@@ -110,12 +105,6 @@ module.exports = (routes, options = {}, cb) => {
 
     socket.on('close', () => {
       socket.emit('disconnect')
-
-      if (options.wsEngine === 'cws') {
-        const i = server.clients.findIndex(c => c === socket)
-        server.clients.splice(i, 1)
-      }
-
       delete server.ids[socket.id]
     })
 

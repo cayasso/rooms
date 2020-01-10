@@ -1,7 +1,7 @@
 const emitter = require('component-emitter')
 const { isFunction, isNumber } = require('./utils')
 
-const createRoom = (ns, { bus, roomTimeout, disableRoomTimeout } = {}) => {
+const createRoom = (ns, { bus, roomTimeout, disableRoomTimeout, rooms } = {}) => {
   const room = emitter({})
   const socks = new Map()
 
@@ -77,7 +77,11 @@ const createRoom = (ns, { bus, roomTimeout, disableRoomTimeout } = {}) => {
   room.dispose = () => {
     socks.clear()
     room.emit('dispose')
-    process.nextTick(() => room.removeAllListeners())
+
+    process.nextTick(() => {
+      room.removeAllListeners()
+      rooms.delete(ns)
+    })
   }
 
   const error = message => {
@@ -92,7 +96,7 @@ module.exports = (options = {}) => {
 
   return (ns, params = {}) => {
     if (!ns) ns = '*'
-    const room = rooms.get(ns) || createRoom(ns, { ...options, ...params })
+    const room = rooms.get(ns) || createRoom(ns, { ...options, ...params, rooms })
     rooms.set(ns, room)
     return room
   }

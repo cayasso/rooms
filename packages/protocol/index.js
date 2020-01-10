@@ -1,7 +1,8 @@
 const { encode, decode } = require('notepack.io')
 
 const OPEN = 1
-const CLOSED = 0
+const CLOSING = 2
+const CLOSED = 3
 
 const types = {
   ID: 1,
@@ -153,6 +154,7 @@ const broadcast = (server, ns, type, data, { to, not, transform } = {}) => {
 module.exports = {
   OPEN,
   CLOSED,
+  CLOSING,
   types,
   packet,
   unpack,
