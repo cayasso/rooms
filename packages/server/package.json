@@ -1,6 +1,6 @@
 {
   "name": "@rooms/server",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Rooms server",
   "author": "Jonathan Brumley <cayasso@gmail.com>",
   "main": "./index.js",
@@ -9,7 +9,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@rooms/protocol": "^0.1.0",
+    "@rooms/protocol": "^0.2.0",
     "component-emitter": "^1.3.0",
     "debug": "^4.1.1",
     "ioredis": "^4.14.1",

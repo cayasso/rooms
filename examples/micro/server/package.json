@@ -1,12 +1,12 @@
 {
   "name": "@rooms/micro-server",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "@rooms/server": "^0.1.1",
+    "@rooms/server": "^0.2.0",
     "micro": "^9.3.4"
   }
 }
